@@ -14,6 +14,12 @@ export const schema = `
     content: String!
   }
 
+  input PostUpdate {
+    id: ID!
+    title: String
+    content: String
+  }
+
   type Query {
     getPosts: [Post!]!
     getPost(id: ID!): Post
@@ -22,6 +28,7 @@ export const schema = `
   type Mutation {
     createPost(newPost: PostCreate!): Post!
     deletePost(id: ID!): [Post!]!
+    updatePost(updatedPost: PostUpdate!): Post!
   }
 `;
 
@@ -56,8 +63,22 @@ export const resolvers = {
       }
       return app.db.posts;
     },
+    updatePost: (_parent, { updatedPost }, { app }) => {
+      const { id, title, content } = updatedPost;
+      const post = app.db.posts.find((post) => post.id === id);
+      if (!post) {
+        throw new Error("Post not found");
+      }
+      if (title !== undefined) {
+        post.title = title;
+      }
+      if (content !== undefined) {
+        post.content = content;
+      }
+
+      return post;
+    },
   },
-  updatePost: () => {},
 };
 
 export const loaders = {};
