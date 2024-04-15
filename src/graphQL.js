@@ -21,6 +21,7 @@ export const schema = `
 
   type Mutation {
     createPost(newPost: PostCreate!): Post!
+    deletePost(id: ID!): [Post!]!
   }
 `;
 
@@ -46,8 +47,17 @@ export const resolvers = {
       app.db.posts.push(post);
       return post;
     },
-    deletePost: () => {},
+    deletePost: (_parent, { id }, { app }) => {
+      const index = app.db.posts.findIndex((post) => post.id === id);
+      if (index > -1) {
+        app.db.posts.splice(index, 1);
+      } else {
+        throw new Error("Post not found");
+      }
+      return app.db.posts;
+    },
   },
+  updatePost: () => {},
 };
 
 export const loaders = {};
